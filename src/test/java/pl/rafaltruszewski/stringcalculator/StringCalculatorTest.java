@@ -25,4 +25,16 @@ class StringCalculatorTest {
         //then
         assertThat(sum).isEqualTo(0);
     }
+
+    @Test
+    public void should_get_sum_for_multi_arguments(){
+        //given
+        String value = "1,2,3";
+
+        //when
+        int sum = calculaor.add(value);
+
+        //then
+        assertThat(sum).isEqualTo(6);
+    }
 }
