@@ -1,5 +1,8 @@
 package pl.rafaltruszewski.stringcalculator;
 
+import java.util.Arrays;
+import java.util.List;
+
 class StringCalculator {
 
     public static final String DEFAULT_DELIMITER = "[,\n]";
@@ -7,24 +10,23 @@ class StringCalculator {
     public int add(String numbers) {
         if(numbers.isEmpty()) return 0;
 
+        List<String> numbersAsString = splitNumbers(numbers);
+
+        return numbersAsString.stream()
+                .mapToInt(Integer::valueOf)
+                .sum();
+    }
+
+    private List<String> splitNumbers(String numbers) {
+        String numbersWithoutDelimiter = numbers;
+
         String delimiter = DEFAULT_DELIMITER;
-
-        String numbersWithoutDelimiter;
-
         if (hasDelimiter(numbers)){
             delimiter = extractDelimiter(numbers);
             numbersWithoutDelimiter = removeDelimiter(delimiter, numbers);
         }
-        else {
-            numbersWithoutDelimiter = numbers;
-        }
-        String[] numbersAsTab = numbersWithoutDelimiter.split(delimiter);
 
-        int sum = 0;
-        for (String number : numbersAsTab) {
-            sum += Integer.valueOf(number);
-        }
-        return sum;
+        return Arrays.asList(numbersWithoutDelimiter.split(delimiter));
     }
 
     private String removeDelimiter(String delimiter, String numbers) {
