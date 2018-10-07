@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowable;
 
 class StringCalculatorTest {
 
@@ -51,7 +52,7 @@ class StringCalculatorTest {
     }
 
     @Test
-    public void should_change_different_delimiter(){
+    public void should_change_to_different_delimiter(){
         //given
         String value = "//;\n1;2;3";
 
@@ -60,5 +61,17 @@ class StringCalculatorTest {
 
         //then
         assertThat(sum).isEqualTo(6);
+    }
+
+    @Test
+    public void should_fail_with_negative_numbers(){
+        //given
+        String value = "1,-2,-3";
+
+        //when
+        Throwable throwable = catchThrowable(() -> calculaor.add(value));
+
+        //then
+        assertThat(throwable).isInstanceOf(NegativesNotAllowed.class).hasMessageContaining("-2,-3");
     }
 }
