@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 
 class StringCalculator {
 
-    public static final String DEFAULT_DELIMITER = "[,\n]";
+    private static final String DEFAULT_DELIMITER = "[,\n]";
 
     public int add(String numbers) throws NegativesNotAllowed {
         if(numbers.isEmpty()) return 0;
@@ -15,6 +15,10 @@ class StringCalculator {
         List<Integer> numbersAsInt = mapToInt(numbersAsString);
         checkNegatives(numbersAsInt);
 
+        return sum(numbersAsInt);
+    }
+
+    private int sum(List<Integer> numbersAsInt) {
         return numbersAsInt.stream()
                 .mapToInt(Integer::valueOf)
                 .sum();
