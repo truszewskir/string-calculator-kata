@@ -37,4 +37,28 @@ class StringCalculatorTest {
         //then
         assertThat(sum).isEqualTo(6);
     }
+
+    @Test
+    public void should_accept_new_line_as_delimiter(){
+        //given
+        String value = "1\n2,3";
+
+        //when
+        int sum = calculaor.add(value);
+
+        //then
+        assertThat(sum).isEqualTo(6);
+    }
+
+    @Test
+    public void should_change_different_delimiter(){
+        //given
+        String value = "//;\n1;2;3";
+
+        //when
+        int sum = calculaor.add(value);
+
+        //then
+        assertThat(sum).isEqualTo(6);
+    }
 }
