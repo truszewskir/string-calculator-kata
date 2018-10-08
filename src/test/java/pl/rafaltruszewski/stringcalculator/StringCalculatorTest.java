@@ -64,6 +64,18 @@ class StringCalculatorTest {
     }
 
     @Test
+    public void should_allow_optional_new_line(){
+        //given
+        String value = "//;1;2;3";
+
+        //when
+        int sum = calculaor.add(value);
+
+        //then
+        assertThat(sum).isEqualTo(6);
+    }
+
+    @Test
     public void should_fail_with_negative_numbers(){
         //given
         String value = "1,-2,-3";
@@ -74,4 +86,6 @@ class StringCalculatorTest {
         //then
         assertThat(throwable).isInstanceOf(NegativesNotAllowed.class).hasMessageContaining("-2,-3");
     }
+
+
 }
