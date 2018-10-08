@@ -20,6 +20,7 @@ class StringCalculator {
 
     private int sum(List<Integer> numbersAsInt) {
         return numbersAsInt.stream()
+                .filter(e -> e <= 1000)
                 .mapToInt(Integer::valueOf)
                 .sum();
     }

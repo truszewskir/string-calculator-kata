@@ -87,5 +87,15 @@ class StringCalculatorTest {
         assertThat(throwable).isInstanceOf(NegativesNotAllowed.class).hasMessageContaining("-2,-3");
     }
 
+    @Test
+    public void should_get_sum_only_for_less_than_1000(){
+        //given
+        String value = "1001,2002,3003,1,2,3";
 
+        //when
+        int sum = calculaor.add(value);
+
+        //then
+        assertThat(sum).isEqualTo(6);
+    }
 }
