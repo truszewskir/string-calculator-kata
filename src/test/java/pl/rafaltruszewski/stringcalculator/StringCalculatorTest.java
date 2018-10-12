@@ -8,11 +8,11 @@ import static org.assertj.core.api.Assertions.catchThrowable;
 
 class StringCalculatorTest {
 
-    private StringCalculator calculaor;
+    private StringCalculator calculator;
 
     @BeforeEach
     public void setUp(){
-        calculaor = new StringCalculator();
+        calculator = new StringCalculator();
     }
 
     @Test
@@ -21,7 +21,7 @@ class StringCalculatorTest {
         String value = "";
 
         //when
-        int sum = calculaor.add(value);
+        int sum = calculator.add(value);
 
         //then
         assertThat(sum).isEqualTo(0);
@@ -33,7 +33,7 @@ class StringCalculatorTest {
         String value = "1,2,3";
 
         //when
-        int sum = calculaor.add(value);
+        int sum = calculator.add(value);
 
         //then
         assertThat(sum).isEqualTo(6);
@@ -45,7 +45,7 @@ class StringCalculatorTest {
         String value = "1\n2,3";
 
         //when
-        int sum = calculaor.add(value);
+        int sum = calculator.add(value);
 
         //then
         assertThat(sum).isEqualTo(6);
@@ -57,7 +57,7 @@ class StringCalculatorTest {
         String value = "//;\n1;2;3";
 
         //when
-        int sum = calculaor.add(value);
+        int sum = calculator.add(value);
 
         //then
         assertThat(sum).isEqualTo(6);
@@ -69,7 +69,7 @@ class StringCalculatorTest {
         String value = "//;1;2;3";
 
         //when
-        int sum = calculaor.add(value);
+        int sum = calculator.add(value);
 
         //then
         assertThat(sum).isEqualTo(6);
@@ -81,7 +81,7 @@ class StringCalculatorTest {
         String value = "1,-2,-3";
 
         //when
-        Throwable throwable = catchThrowable(() -> calculaor.add(value));
+        Throwable throwable = catchThrowable(() -> calculator.add(value));
 
         //then
         assertThat(throwable).isInstanceOf(NegativesNotAllowed.class).hasMessageContaining("-2,-3");
@@ -93,7 +93,19 @@ class StringCalculatorTest {
         String value = "1001,2002,3003,1,2,3";
 
         //when
-        int sum = calculaor.add(value);
+        int sum = calculator.add(value);
+
+        //then
+        assertThat(sum).isEqualTo(6);
+    }
+
+    @Test
+    public void should_allow_delimiter_with_many_characters(){
+        //given
+        String value = "//[ppp]\n1ppp2ppp3";
+
+        //when
+        int sum = calculator.add(value);
 
         //then
         assertThat(sum).isEqualTo(6);
