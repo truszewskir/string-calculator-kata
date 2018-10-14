@@ -12,7 +12,7 @@ class StringCalculatorTest {
 
     @BeforeEach
     public void setUp(){
-        calculator = new StringCalculator();
+        calculator = new StringCalculator(new NumbersParser());
     }
 
     @Test
@@ -103,6 +103,18 @@ class StringCalculatorTest {
     public void should_allow_delimiter_with_many_characters(){
         //given
         String value = "//[ppp]\n1ppp2ppp3";
+
+        //when
+        int sum = calculator.add(value);
+
+        //then
+        assertThat(sum).isEqualTo(6);
+    }
+
+    @Test
+    public void should_allow_many_delimiters(){
+        //given
+        String value = "//[ww][%%]\n1ww2%%3";
 
         //when
         int sum = calculator.add(value);
