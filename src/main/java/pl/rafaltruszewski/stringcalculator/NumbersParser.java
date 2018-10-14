@@ -1,17 +1,17 @@
 package pl.rafaltruszewski.stringcalculator;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 class NumbersParser {
-    private static final String NEW_LINE = "\n";
-    private static final String DEFAULT_DELIMITER_REGEX = "[," + NEW_LINE + "]";
-    private static final Pattern MULTI_DELIMITER_REGEX = Pattern.compile("^//(\\[.+\\])+\n");
-    private static final Pattern SINGLE_DELIMITER_REGEX = Pattern.compile("^//(.)\n?");
+    private static final String DEFAULT_DELIMITER = "[," + "\n" + "]";
+    private static final Pattern NUMBERS_WITH_MULTI_DELIMITER = Pattern.compile("^//(\\[.+\\])\n(.+)$");
+    private static final Pattern NUMBERS_WITH_SINGLE_DELIMITER = Pattern.compile("^//(.)\n?(.+)$");
+    private static final Pattern SINGLE_DELIMITERS = Pattern.compile("(\\[.+?\\])");
 
     public NumbersParser() {
     }
@@ -21,7 +21,7 @@ class NumbersParser {
             SplitArguments splitArguments = findDelimiters(numbers);
             return split(splitArguments);
         } else {
-            return Arrays.asList(numbers.split(DEFAULT_DELIMITER_REGEX));
+            return Arrays.asList(numbers.split(DEFAULT_DELIMITER));
         }
     }
 
@@ -32,13 +32,11 @@ class NumbersParser {
     }
 
     private SplitArguments findDelimiters(String numbersWithDelimiters){
-        Pattern MULTI_DELIMITER_REGEX = Pattern.compile("^//(\\[.+\\])\n(.+)$");
-        Matcher multiDelimiterMatcher = MULTI_DELIMITER_REGEX.matcher(numbersWithDelimiters);
+        Matcher multiDelimiterMatcher = NUMBERS_WITH_MULTI_DELIMITER.matcher(numbersWithDelimiters);
         if (multiDelimiterMatcher.find()) {
             String manyDelimiters = multiDelimiterMatcher.group(1);
 
-            Pattern singleDelimitersPatters = Pattern.compile("(\\[.+?\\])");
-            Matcher singleDelimitersMatcher = singleDelimitersPatters.matcher(manyDelimiters);
+            Matcher singleDelimitersMatcher = SINGLE_DELIMITERS.matcher(manyDelimiters);
 
             List<String> delimiters = new LinkedList<>();
             while (singleDelimitersMatcher.find()){
@@ -49,13 +47,12 @@ class NumbersParser {
             return new SplitArguments(delimiters, multiDelimiterMatcher.group(2));
         }
 
-        Pattern SINGLE_DELIMITER_REGEX = Pattern.compile("^//(.)\n?(.+)$");
-        Matcher singleDelimiterMatcher = SINGLE_DELIMITER_REGEX.matcher(numbersWithDelimiters);
+        Matcher singleDelimiterMatcher = NUMBERS_WITH_SINGLE_DELIMITER.matcher(numbersWithDelimiters);
         if (singleDelimiterMatcher.find()) {
             String delimiter = singleDelimiterMatcher.group(1);
             String numbersWithoutDelimiter = singleDelimiterMatcher.group(2);
 
-            return new SplitArguments(Arrays.asList(delimiter), numbersWithoutDelimiter);
+            return new SplitArguments(Collections.singletonList(delimiter), numbersWithoutDelimiter);
         }
 
         throw new RuntimeException("Numbers " + numbersWithDelimiters + " have invalid delimiter");
@@ -79,8 +76,7 @@ class NumbersParser {
         }
 
         String delimitersAsRegex() {
-            return delimiters.stream()
-                    .collect(Collectors.joining("|"));
+            return String.join("|", delimiters);
         }
     }
 }
