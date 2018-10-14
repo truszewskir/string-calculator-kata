@@ -7,80 +7,80 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-public class NumbersParser {
+class NumbersParser {
     private static final String NEW_LINE = "\n";
-    private static final String DEFAULT_DELIMITERS = "[," + NEW_LINE + "]";
-    private static final Pattern MULTI_DELIMITER_REGEX = Pattern.compile("^//(\\[.+\\])+\\n");
-    private static final Pattern SINGLE_DELIMITER_REGEX = Pattern.compile("//(.)\n?");
+    private static final String DEFAULT_DELIMITER_REGEX = "[," + NEW_LINE + "]";
+    private static final Pattern MULTI_DELIMITER_REGEX = Pattern.compile("^//(\\[.+\\])+\n");
+    private static final Pattern SINGLE_DELIMITER_REGEX = Pattern.compile("^//(.)\n?");
 
     public NumbersParser() {
     }
 
     public List<String> parse(String numbers) {
         if (hasDelimiters(numbers)) {
-            List<String> delimiters = getDelimiters(numbers);
-            String numbersWithoutDelimiter = removeDelimiters(delimiters, numbers);
-            String delimitersAsRegex = prepareRegex(delimiters);
-            return Arrays.asList(numbersWithoutDelimiter.split(delimitersAsRegex));
+            SplitArguments splitArguments = findDelimiters(numbers);
+            return split(splitArguments);
         } else {
-            return Arrays.asList(numbers.split(DEFAULT_DELIMITERS));
+            return Arrays.asList(numbers.split(DEFAULT_DELIMITER_REGEX));
         }
     }
 
-    private String prepareRegex(List<String> delimiters) {
-        return delimiters.stream()
-                .collect(Collectors.joining("|"));
+    private List<String> split(SplitArguments splitArguments){
+        String delimitersForSplit = splitArguments.delimitersAsRegex();
+        String numbersWithoutDelimiters = splitArguments.getNumbers();
+        return Arrays.asList(numbersWithoutDelimiters.split(delimitersForSplit));
     }
 
-    private String removeDelimiters(List<String> delimiters, String numbers) {
-        String numbersWithoutDelimiter;
-        if (numbers.startsWith("//[")) {
-            String collected = delimiters.stream()
-                    .map(e -> "[" + e + "]")
-                    .collect(Collectors.joining());
-            numbersWithoutDelimiter = numbers.substring(3 + collected.length());
-
-        } else {
-            String collected = delimiters.stream()
-                    .collect(Collectors.joining());
-            numbersWithoutDelimiter = numbers.substring(2 + collected.length());
-
-        }
-
-        if (numbersWithoutDelimiter.startsWith(NEW_LINE)) {
-            numbersWithoutDelimiter = numbersWithoutDelimiter.substring(1);
-        }
-
-        return numbersWithoutDelimiter;
-    }
-
-    private List<String> getDelimiters(String numbers) {
-
-        Matcher multiDelimiterMatcher = MULTI_DELIMITER_REGEX.matcher(numbers);
+    private SplitArguments findDelimiters(String numbersWithDelimiters){
+        Pattern MULTI_DELIMITER_REGEX = Pattern.compile("^//(\\[.+\\])\n(.+)$");
+        Matcher multiDelimiterMatcher = MULTI_DELIMITER_REGEX.matcher(numbersWithDelimiters);
         if (multiDelimiterMatcher.find()) {
-            String manyDelim = multiDelimiterMatcher.group(1);
+            String manyDelimiters = multiDelimiterMatcher.group(1);
 
-            Pattern delimExtractor = Pattern.compile("(\\[.+?\\])");
-            Matcher delimMatcher = delimExtractor.matcher(manyDelim);
+            Pattern singleDelimitersPatters = Pattern.compile("(\\[.+?\\])");
+            Matcher singleDelimitersMatcher = singleDelimitersPatters.matcher(manyDelimiters);
 
-            List<String> result = new LinkedList<>();
-            while (delimMatcher.find()){
-                String group = delimMatcher.group();
-                result.add(group.substring(1, group.length()-1));
+            List<String> delimiters = new LinkedList<>();
+            while (singleDelimitersMatcher.find()){
+                String group = singleDelimitersMatcher.group();
+                delimiters.add(group.substring(1, group.length()-1));
             }
-            return result;
+
+            return new SplitArguments(delimiters, multiDelimiterMatcher.group(2));
         }
 
-        Matcher singleDelimiterMatcher = SINGLE_DELIMITER_REGEX.matcher(numbers);
+        Pattern SINGLE_DELIMITER_REGEX = Pattern.compile("^//(.)\n?(.+)$");
+        Matcher singleDelimiterMatcher = SINGLE_DELIMITER_REGEX.matcher(numbersWithDelimiters);
         if (singleDelimiterMatcher.find()) {
-            return Arrays.asList(singleDelimiterMatcher.group(1));
+            String delimiter = singleDelimiterMatcher.group(1);
+            String numbersWithoutDelimiter = singleDelimiterMatcher.group(2);
+
+            return new SplitArguments(Arrays.asList(delimiter), numbersWithoutDelimiter);
         }
 
-        throw new RuntimeException("Numbers " + numbers + " have invalid delimiter");
+        throw new RuntimeException("Numbers " + numbersWithDelimiters + " have invalid delimiter");
     }
 
     private boolean hasDelimiters(String numbers) {
         return numbers.startsWith("//");
     }
 
+    private static class SplitArguments {
+        private final List<String> delimiters;
+        private final String numbers;
+
+        private SplitArguments(List<String> delimiters, String numbers) {
+            this.delimiters = delimiters;
+            this.numbers = numbers;
+        }
+
+        String getNumbers() {
+            return numbers;
+        }
+
+        String delimitersAsRegex() {
+            return delimiters.stream()
+                    .collect(Collectors.joining("|"));
+        }
+    }
 }
