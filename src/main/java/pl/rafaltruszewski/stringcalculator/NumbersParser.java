@@ -6,6 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 class NumbersParser {
     private static final String DEFAULT_DELIMITER = "[," + "\n" + "]";
@@ -16,13 +17,19 @@ class NumbersParser {
     public NumbersParser() {
     }
 
-    public List<String> parse(String numbers) {
+    public List<Integer> parse(String numbers) {
         if (hasDelimiters(numbers)) {
             SplitArguments splitArguments = findDelimiters(numbers);
-            return split(splitArguments);
+            return mapToInt(split(splitArguments));
         } else {
-            return Arrays.asList(numbers.split(DEFAULT_DELIMITER));
+            return mapToInt(Arrays.asList(numbers.split(DEFAULT_DELIMITER)));
         }
+    }
+
+    private List<Integer> mapToInt(List<String> numbersAsString) {
+        return numbersAsString.stream()
+                .map(Integer::valueOf)
+                .collect(Collectors.toList());
     }
 
     private List<String> split(SplitArguments splitArguments){

@@ -14,8 +14,7 @@ class StringCalculator {
     public int add(String numbers) throws NegativesNotAllowed {
         if(numbers.isEmpty()) return 0;
 
-        List<String> numbersAsString = numbersParser.parse(numbers);
-        List<Integer> numbersAsInt = mapToInt(numbersAsString);
+        List<Integer> numbersAsInt = numbersParser.parse(numbers);
         checkNegatives(numbersAsInt);
 
         return sum(numbersAsInt);
@@ -47,12 +46,6 @@ class StringCalculator {
         }
 
         throw new NegativesNotAllowed(message.toString());
-    }
-
-    private List<Integer> mapToInt(List<String> numbersAsString) {
-        return numbersAsString.stream()
-                .map(Integer::valueOf)
-                .collect(Collectors.toList());
     }
 
 }
